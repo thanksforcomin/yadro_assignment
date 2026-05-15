@@ -10,4 +10,4 @@ add_executable(yadro_assignment
   src/main.cpp
 )
 
-target_include_directories(yadro_assignment include/)
+target_include_directories(yadro_assignment PRIVATE include/)
