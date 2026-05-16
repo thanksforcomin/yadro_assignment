@@ -25,15 +25,15 @@ namespace parser {
     return lines;
   }
 
-  auto parse_line(std::string_view line) -> std::vector<int> {
+  auto parse_line(std::string_view line) -> std::vector<size_t> {
     auto to_sv = [](auto &&data) -> std::string_view {
       return std::string_view(data.begin(), data.end());
     };
     
     auto filter_empty = [](std::string_view sv) -> bool { return !sv.empty(); };
 
-    auto to_int = [&line](std::string_view sv) -> int {
-      int val;
+    auto to_size_t = [&line](std::string_view sv) -> size_t {
+      size_t val;
       auto [ptr, ec] = std::from_chars(sv.data(), sv.data() + sv.size(), val);
       if (ec != std::errc{} || ptr != sv.data() + sv.size())
         // We can just exit() inside because spec allows hard termination on
@@ -46,10 +46,10 @@ namespace parser {
     auto tokens = line | std::ranges::views::split(' ') |
                   std::ranges::views::transform(to_sv) |
                   std::ranges::views::filter(filter_empty) |
-                  std::ranges::views::transform(to_int);
+                  std::ranges::views::transform(to_size_t);
 
 
-    return std::vector<int>(tokens.begin(), tokens.end());
+    return std::vector<size_t>(tokens.begin(), tokens.end());
   }
 
   auto parse_from_file(const std::string &filename) -> abstract::GlobalState {
@@ -128,7 +128,7 @@ namespace parser {
       mach.id = i;
 
       for (size_t item : items) {
-        mach.queue.push_back(abstract::Item{.id = next_id++, .type = item});
+        mach.workload.push_back(abstract::Item{.id = next_id++, .type = item});
       }
 
       total_items += q;

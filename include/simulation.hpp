@@ -5,57 +5,25 @@
 #include <queue>
 
 namespace simulation {
-  enum EventType {
-    FINISH = 0,
-    START,
-    WAIT,
-    READY,
-    STOP
-  };
-
-  struct Event {
-    EventType type;
-    size_t time = 0;
-    size_t k = 0;
-    size_t i = 0;
-    size_t j = 0;
-    size_t p = 0;
-
-    auto operator>(const Event &other) -> bool {
-      if (time != other.time)
-        return time > other.time;
-      if (type != other.type)
-        return type > other.type;
-      if (j != other.j)
-        return j > other.j;
-      return k > other.k;
-    }
-  };
-
-  struct Item {
-    size_t id;
-    size_t type;
-  };
+  using namespace abstract;
+  using abstract::EventType;
   
-  struct Machine {
-    size_t id;
-    std::deque<Item> workload;
-    size_t busy_until;
-    size_t current_workload;
-  };
-
   using event_queue_t =
       std::priority_queue<Event, std::vector<Event>, std::greater<Event>>;
   
   class Simulation {
     event_queue_t event_queue;
     std::vector<Machine> machines;
+    std::vector<std::vector<size_t>> T;
+    size_t total_items;
+    size_t completed_items = 0;
 
   public:
     auto init(abstract::GlobalState &&state) -> Simulation;
 
-    Simulation(event_queue_t &&event_queue,
-               std::vector<Machine> &&machines) noexcept;
+    Simulation(event_queue_t &&event_queue, std::vector<Machine> &&machines,
+               std::vector<std::vector<size_t>> &&T,
+               size_t total_items) noexcept;
 
     Simulation(const Simulation &) = delete;
     auto operator=(const Simulation &) -> Simulation & = delete;
@@ -69,7 +37,6 @@ namespace simulation {
 
   private:
     auto find_fitting_machine() -> Machine&;
-    
   };
   
 }
