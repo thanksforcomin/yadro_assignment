@@ -56,7 +56,7 @@ namespace parser {
     std::ifstream filestream(filename);
     if (!filestream) {
       std::cerr << "Could not open file\n";
-      std::exit(0);
+      std::exit(1);
     }
 
     auto lines = get_lines(std::move(filestream));
@@ -94,7 +94,7 @@ namespace parser {
         report_error(line);
 
       if (!std::ranges::all_of(
-              row, [](int num) -> bool { return num >= 0 && num < +10000; }))
+              row, [](int num) -> bool { return num >= 0 && num <= 10000; }))
         report_error(line);
       state.T.push_back(std::move(row));
     }
@@ -115,7 +115,7 @@ namespace parser {
         report_error(line);
 
       int q = nums[0];
-      if (q < 0 || nums.size() != q + 1)
+      if (q < 0 || nums.size() != static_cast<size_t>(q) + 1)
         report_error(line);
 
       auto items = nums | std::ranges::views::drop(1);
@@ -135,10 +135,13 @@ namespace parser {
       state.machines.push_back(std::move(mach));
     }
 
+    state.total_items = total_items;
+
     while (it != lines.end()) {
       std::string_view trailing(*it++);
-      if (!std::ranges::all_of(trailing,
-                               [](char c) -> bool { return std::isspace(c); }))
+      if (!std::ranges::all_of(trailing, [](char c) -> bool {
+            return std::isspace(static_cast<unsigned char>(c));
+      }))
         report_error(trailing);
     }
 

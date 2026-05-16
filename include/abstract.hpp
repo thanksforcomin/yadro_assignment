@@ -18,10 +18,10 @@ namespace abstract {
   struct GlobalState {
     size_t M = 0;
     size_t N = 0;
+
+    size_t total_items = 0;
     
     std::vector<std::vector<int>> T;
     std::vector<Machine> machines;
-    
-    int total_items = 0;
   };
 }
