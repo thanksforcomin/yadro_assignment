@@ -10,7 +10,7 @@
 
 namespace parser {
   [[noreturn]] auto report_error(std::string_view line)->void {
-    std::cerr << line;
+    std::cout << line;
     std::exit(1);
   }
   

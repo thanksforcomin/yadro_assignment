@@ -30,11 +30,10 @@ namespace simulation {
       for (auto &machine : state.machines) {
         if (machine.workload.empty())
           continue;
-
         
         auto item = machine.workload.front();
         machine.workload.pop_front();  
-        machine.total_workload -= T[item.type][machine.id];
+        machine.total_workload -= state.T[item.type][machine.id];
         event_queue.push(Event{
             .type = START,
             .time = 0,

@@ -8,6 +8,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(yadro_assignment
   src/main.cpp
+  src/parser.cpp
+  src/simulation.cpp
 )
 
 target_include_directories(yadro_assignment PRIVATE include/)

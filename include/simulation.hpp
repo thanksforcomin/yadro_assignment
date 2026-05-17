@@ -20,7 +20,7 @@ namespace simulation {
     size_t M;
 
   public:
-    auto init(abstract::GlobalState &&state) -> Simulation;
+    static auto init(abstract::GlobalState &&state) -> Simulation;
 
     Simulation(event_queue_t &&event_queue, std::vector<Machine> &&machines,
                std::vector<std::vector<size_t>> &&T,

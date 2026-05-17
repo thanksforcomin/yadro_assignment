@@ -43,7 +43,7 @@ namespace abstract {
     size_t j = 0;
     size_t p = 0;
 
-    auto operator>(const Event &other) -> bool {
+    auto operator>(const Event &other) const -> bool {
       if (time != other.time)
         return time > other.time;
       if (type != other.type)
