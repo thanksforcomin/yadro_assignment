@@ -7,6 +7,7 @@
 auto main(int argc, char *argv[]) -> int {
   if (argc != 2) {
     std::cout << std::format("Usage: {} filename", argv[0]);
+    return 1;
   }
 
   auto global_state = parser::parse_from_file(argv[1]);
