@@ -21,12 +21,17 @@ namespace simulation {
           event_queue.push(Event{
               .type = READY,
               .time = 0,
+              .k = item.id,
               .j = machine.id
           });
         }
       }
     } else {
       for (auto &machine : state.machines) {
+        if (machine.workload.empty())
+          continue;
+
+        
         auto item = machine.workload.front();
         machine.workload.pop_front();  
         machine.total_workload -= T[item.type][machine.id];
@@ -34,6 +39,7 @@ namespace simulation {
             .type = START,
             .time = 0,
             .k = item.id,
+            .i = item.type,
             .j = machine.id
         });
       }
@@ -60,14 +66,19 @@ namespace simulation {
       switch (event.type) {
       case START:
         process_start(event);
+        break;
       case FINISH:
         process_finish(event);
+        break;
       case WAIT:
         process_wait(event);
+        break;
       case READY:
         process_ready(event);
+        break;
       case STOP:
         process_stop(event);
+        break;
       default:
         break;
       }
@@ -75,20 +86,22 @@ namespace simulation {
   }
 
   auto Simulation::process_start(const Event &event) -> void {
-    std::cout << std::format("start {} {} {} {}", event.time, event.k,
+    std::cout << std::format("start {} {} {} {}\n", event.time, event.k,
                              event.i, event.j);
 
     auto duration = T[event.i][event.j];
-    machines[event.j].busy_until += duration;
-    event_queue.push(Event{.type = FINISH,
-                           .time = event.time + duration,
-                           .i = event.i,
-                           .j = event.j
+    machines[event.j].busy_until = event.time + duration;
+    event_queue.push(Event{
+        .type = FINISH,
+        .time = event.time + duration,
+        .k = event.k,
+        .i = event.i,
+        .j = event.j
     });
   }
 
   auto Simulation::process_finish(const Event &event) -> void {
-    std::cout << std::format("finish {} {} {} {}", event.time, event.k, event.i,
+    std::cout << std::format("finish {} {} {} {}\n", event.time, event.k, event.i,
                              event.j);
 
     if (event.i == M - 2) {
@@ -142,16 +155,16 @@ namespace simulation {
   }
 
   auto Simulation::process_wait(const Event &event) -> void {
-    std::cout << std::format("wait {} {} {} {} {}", event.time, event.k,
+    std::cout << std::format("wait {} {} {} {} {}\n", event.time, event.k,
                              event.i, event.j, event.p);
 
     auto item = Item{.id = event.k, .type = event.i};
-    machines[event.j].total_workload += T[item.id][event.j];
+    machines[event.j].total_workload += T[item.type][event.j];
     machines[event.j].workload.push_back(item);
   }
 
   auto Simulation::process_ready(const Event &event) -> void {
-    std::cout << std::format("ready {} {} {}", event.time, event.k, event.j);
+    std::cout << std::format("ready {} {} {}\n", event.time, event.k, event.j);
 
     completed_items++;
     if (completed_items == total_items)
@@ -159,8 +172,20 @@ namespace simulation {
   }
 
   auto Simulation::process_stop(const Event &event) -> void {
-    std::cout << std::format("stop {}", event.time);
+    std::cout << std::format("stop {}\n", event.time);
   }
-  
+
+  auto Simulation::find_fitting_machine() -> Machine & {
+    size_t best_j = 0;
+    size_t min_workload = machines[0].total_workload;
+    for (size_t i = 0; i < machines.size(); ++i) {
+      if (machines[i].total_workload < min_workload) {
+        min_workload = machines[i].total_workload;
+        best_j = i;
+      }
+    }
+
+    return machines[best_j];
+  }
 } // namespace simulation
 
