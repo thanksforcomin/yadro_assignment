@@ -9,3 +9,4 @@
 namespace parser {
   auto parse_from_file(const std::string &filename) -> abstract::GlobalState;
 }
+

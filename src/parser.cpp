@@ -147,5 +147,6 @@ namespace parser {
 
     return state;
   }
-  
-}
+
+} // namespace parser
+

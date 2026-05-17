@@ -53,4 +53,5 @@ namespace abstract {
       return k > other.k;
     }
   };
-}
+} // namespace abstract
+
